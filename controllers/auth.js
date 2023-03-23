@@ -23,7 +23,7 @@ const tokenHandler = async (user) => {
 // handles register
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, image, bio, friends, messages, reqs } = req.body
+        const { name, email, password, image, bio, friends, messages, reqs, unread } = req.body
         // this is just a demo code and not for production
 
         const newuser = new user({
@@ -34,6 +34,7 @@ exports.register = async (req, res, next) => {
             bio: bio,
             friends: friends,
             messages: messages,
+            unread: unread,
             req: reqs
         })
         await newuser.save();
@@ -65,11 +66,10 @@ exports.login = async (req, res, next) => {
         const id = userData._id
         const username = userData.username
         if (!(id && (password === userData.password))) throw creatError.Unauthorized()
-        console.log(id)
         const token = await tokenHandler({ id })
-        console.log(token)
-        res.send(id)
+        res.send(token)
     } catch (error) {
         next(error)
     }
 }
+

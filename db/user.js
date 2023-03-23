@@ -19,6 +19,13 @@ const userSchema = new Schema({
             time: String,
         }
     ],
+    unread: [
+        {
+            user: String,
+            content: String,
+            time: String,
+        }
+    ],
     req: [String]
 })
 

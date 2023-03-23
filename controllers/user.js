@@ -8,7 +8,7 @@ exports.getUser = async (req, res, next) => {
         const { email } = req.payload
         if (!email) throw creatError.Unauthorized()
 
-        const userData = db.get(email)
+        const userData = await user.findOne({ email: email })
 
         if (!userData) throw creatError.NotFound()
 
@@ -26,26 +26,38 @@ exports.getUser = async (req, res, next) => {
 
 exports.addUser = async (req, res, next) => {
     try {
+        const { name, email, password, image, bio, friends, messages, reqs, unread } = req.body
         const newuser = new user({
-            name: 'String',
-            email: 'String',
-            password: 'String',
-            image: 'String',
-            bio: 'String',
-            friends: ['String'],
-            messages: [
-                {
-                    user: 'String',
-                    content: 'String',
-                    time: 'String',
-                }
-            ],
-            req: ['String']
+            name: name,
+            email: email,
+            password: password,
+            image: image,
+            bio: bio,
+            friends: friends,
+            messages: messages,
+            unread: unread,
+            req: reqs
         })
         await newuser.save();
         res.send("Done")
 
     } catch (error) {
+        next(error)
+    }
+}
+
+exports.getChats = async (req, res, next) => {
+    try {
+        let messages = [];
+        let userobj = await user.findOne({ email: email })
+        messages.push(userobj.messages)
+        userobj.friends.forEach(async (element) => {
+            let data = await user.findOne({ email: element })
+            messages.push(data.messages);
+        });
+        res.send(messages);
+    }
+    catch (error) {
         next(error)
     }
 }
