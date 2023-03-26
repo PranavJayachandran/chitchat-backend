@@ -29,5 +29,10 @@ module.exports = {
                 resolve(payload)
             })
         })
+    },
+    getIdFromToken: (token) => {
+        const decodedToken = jwt.verify(token, process.env.JWT_ACCESS_TOKEN_SECRET);
+        const userId = decodedToken.userId;
+        return (decodedToken.id);
     }
 }

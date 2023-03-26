@@ -61,7 +61,6 @@ exports.login = async (req, res, next) => {
         const { email, password } = req.body
 
         const userData = await user.findOne({ email: email })
-        console.log(userData._id)
         if (!userData) throw creatError.NotFound()
         const id = userData._id
         const username = userData.username

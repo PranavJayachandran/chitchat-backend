@@ -1,24 +1,41 @@
 const creatError = require('http-errors')
-const JSONdb = require('simple-json-db')
-const db = new JSONdb(process.env.JSON_DB_PATH, { asyncWrite: true })
+const jwt = require('jsonwebtoken')
 const user = require("../db/user")
+const { getIdFromToken } = require("../utils/jwt")
 exports.getUser = async (req, res, next) => {
     try {
         // checking for any error occurance
-        const { email } = req.payload
+        const email = req.body.email
         if (!email) throw creatError.Unauthorized()
 
         const userData = await user.findOne({ email: email })
 
         if (!userData) throw creatError.NotFound()
+        res.status(200).send(userData)
+    } catch (error) {
+        next(error)
+    }
+}
+exports.getUserByUserName = async (req, res, next) => {
+    try {
+        // checking for any error occurance
+        const name = req.body.name
+        if (!name) throw creatError.Unauthorized()
 
-        // creating user as json
-        const userDataObj = JSON.parse(userData)
+        const userData = await user.findOne({ name: name })
 
-        // remove the password key before sending it to client
-        delete userDataObj.password
-
-        res.status(200).send(userDataObj)
+        if (!userData) throw creatError.NotFound()
+        res.status(200).send(userData)
+    } catch (error) {
+        next(error)
+    }
+}
+exports.getUsers = async (req, res, next) => {
+    try {
+        // checking for any error occurance
+        const userData = await user.find({})
+        if (!userData) throw creatError.NotFound()
+        res.status(200).send(userData)
     } catch (error) {
         next(error)
     }
@@ -48,6 +65,7 @@ exports.addUser = async (req, res, next) => {
 
 exports.getChats = async (req, res, next) => {
     try {
+        const email = req.body.email
         let messages = [];
         let userobj = await user.findOne({ email: email })
         messages.push(userobj.messages)
